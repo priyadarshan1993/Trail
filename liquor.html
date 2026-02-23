@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRINKS MENU — Daily All Day Pune</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Poppins,sans-serif;background:#0e0e0f;color:#fff}
+header{position:sticky;top:0;background:#0e0e0f;border-bottom:1px solid #222;padding:10px;text-align:center;font-weight:600;font-size:14px}
+.nav{position:sticky;top:40px;z-index:999;display:flex;gap:10px;overflow-x:auto;padding:8px;border-bottom:1px solid #1c1c1f;background:#0e0e0f}
+.nav a{color:#ffb703;text-decoration:none;font-size:12px;white-space:nowrap}
+.section{padding:8px 12px}
+.section h2{font-size:14px;margin:10px 0 6px;border-left:2px solid #ffb703;padding-left:6px;scroll-margin-top:90px;}
+.card{border-bottom:1px solid #1c1c1f}
+.item{display:flex;justify-content:space-between;padding:8px 2px;cursor:pointer}
+.name{font-size:13px}
+.price{color:#ffb703;font-weight:600;font-size:13px}
+.desc{display:none;color:#9a9a9a;font-size:12px;padding-bottom:6px}
+.load{padding:8px;text-align:center}
+button{background:#ffb703;border:none;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer}
+  .category{color:#ffb703;}
+</style>
+</head>
+<body>
+
+<header>DRINKS MENU — Daily All Day Pune</header>
+
+<div class="nav" id="nav"></div>
+<div class="section" id="menu"></div>
+
+<script>
+function toggleDesc(el){
+ const d = el.nextElementSibling;
+ d.style.display = d.style.display==="block"?"none":"block";
+}
+
+function render(csv){
+ const rows = csv.trim().split('\n').slice(1).map(r=>r.split('*'));
+ const menu = document.getElementById('menu');
+ const nav = document.getElementById('nav');
+ menu.innerHTML=""; nav.innerHTML="";
+
+ rows.forEach(cols=>{
+  const name=cols[0];
+  const price=parseFloat(cols[1]);
+  const desc=cols[2]||"";
+
+  if(price===0){
+   const id=name.replace(/[^a-z0-9]/gi,'_');
+   const h2=document.createElement('h2');
+   h2.textContent=name;
+   h2.id=id;
+   h2.className="category";
+   menu.appendChild(h2);
+
+   const link=document.createElement('a');
+   link.href="#"+id;
+   link.textContent=name;
+   nav.appendChild(link);
+  }else{
+   const card=document.createElement('div');
+   card.className="card";
+
+   const item=document.createElement('div');
+   item.className="item";
+   item.onclick=()=>toggleDesc(item);
+
+   const nm=document.createElement('div');
+   nm.className="name";
+   nm.textContent=name;
+
+   const pr=document.createElement('div');
+   pr.className="price";
+   pr.textContent=price;
+
+   const d=document.createElement('div');
+   d.className="desc";
+   d.textContent=desc;
+
+   item.appendChild(nm);
+   item.appendChild(pr);
+   card.appendChild(item);
+   card.appendChild(d);
+   menu.appendChild(card);
+  }
+ });
+}
+
+// Try auto CSV fetch (GitHub/server)
+fetch("liquor.csv?v=" + Date.now(), {
+  cache: "no-store"
+})
+ .then(r=>r.text())
+ .then(t=>render(t))
+ .catch(()=>{ /* ignore */ });
+
+// Local file picker
+document.getElementById('fileInput').addEventListener('change',e=>{
+ const file=e.target.files[0];
+ if(!file) return;
+ const reader=new FileReader();
+ reader.onload=ev=>render(ev.target.result);
+ reader.readAsText(file);
+});
+</script>
+
+</body>
+</html>
