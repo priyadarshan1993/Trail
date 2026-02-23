@@ -35,9 +35,16 @@ function toggleDesc(el){
  const d = el.nextElementSibling;
  d.style.display = d.style.display==="block"?"none":"block";
 }
-
+function parseCSV(text){
+  return text.trim().split("\n").slice(1).map(r=>{
+    const cols = r.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+    return cols.map(v=>v.replace(/^"|"$/g,""));
+  });
+}
+ 
+ 
 function render(csv){
- const rows = csv.trim().split('\n').slice(1).map(r=>r.split('*'));
+ const rows = parseCSV(csv);
  const menu = document.getElementById('menu');
  const nav = document.getElementById('nav');
  menu.innerHTML=""; nav.innerHTML="";
@@ -94,19 +101,8 @@ fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vTuqOGAiEQYlgwacbHKi_QRJe
 })
  .then(r=>r.text())
  .then(t=>render(t))
- .catch(()=>{ /* ignore */ });
- .then(r=>r.text())
- .then(t=>render(t))
- .catch(()=>{ /* ignore */ });
-
-// Local file picker
-document.getElementById('fileInput').addEventListener('change',e=>{
- const file=e.target.files[0];
- if(!file) return;
- const reader=new FileReader();
- reader.onload=ev=>render(ev.target.result);
- reader.readAsText(file);
-});
+ .catch(()=>{});
+ 
 </script>
 
 </body>
